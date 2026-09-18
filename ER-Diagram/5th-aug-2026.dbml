@@ -1,0 +1,398 @@
+// Database Markup Language (DBML) Specification for dbdiagram.io
+// Performance Management System (PMS) Backend Database Schema
+// Date: 5th August 2026
+
+// ==========================================
+// 1. CORE SYSTEM USERS
+// ==========================================
+Table users {
+  emp_id integer [pk, increment, note: "Employee ID (Primary Key)"]
+  college_id varchar(20) [unique, not null]
+  name varchar(50) [not null]
+  college_email_id varchar(100) [unique, not null]
+  password varchar(255) [not null]
+  role varchar [not null, note: "staff | teacher | hod | establishment | principal | admin"]
+  designation varchar [not null, note: "professor | associate_professor | assistant_professor | hod"]
+  status varchar [not null, default: "active", note: "active | inactive | retired | suspended"]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 2. PROFILE & PERSONAL DETAILS
+// ==========================================
+Table user_basic_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  profile_pic varchar [null]
+  aadhaar_number varchar(12) [unique, not null]
+  pancard_number varchar(10) [unique, not null]
+  present_address text [not null]
+  dob date [not null, note: "Format: YYYY-MM-DD"]
+  blood_group varchar [not null, note: "A+ | A- | B+ | B- | AB+ | AB- | O+ | O-"]
+  contact_number varchar(10) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_professional_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  date_of_joining date [not null]
+  relieving_date date [null]
+  faculty_serving varchar [not null, note: "permanent | part-time | contractual"]
+  retirement_date date [null]
+  last_promotion_date date [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 3. ACADEMIC QUALIFICATIONS
+// ==========================================
+Table user_secondary_qualification_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_school varchar [not null]
+  board varchar [not null]
+  school_address text [not null]
+  marking_scheme varchar [default: "percentage", note: "percentage | cgpa"]
+  percentage decimal(5,2) [null]
+  cgpa decimal(4,2) [null]
+  year_of_passing integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_higher_secondary_qualification_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_school varchar [not null]
+  board varchar [not null]
+  school_address text [not null]
+  marking_scheme varchar [default: "percentage", note: "percentage | cgpa"]
+  percentage decimal(5,2) [null]
+  cgpa decimal(4,2) [null]
+  year_of_passing integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_undergraduate_qualification_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_college varchar [not null]
+  university varchar [not null]
+  college_address text [not null]
+  course varchar [not null]
+  branch varchar [not null]
+  marking_scheme varchar [default: "percentage", note: "percentage | cgpa"]
+  percentage decimal(5,2) [null]
+  cgpa decimal(4,2) [null]
+  year_of_passing integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_postgraduate_qualification_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_college varchar [not null]
+  university varchar [not null]
+  college_address text [not null]
+  course varchar [not null]
+  branch varchar [not null]
+  marking_scheme varchar [default: "percentage", note: "percentage | cgpa"]
+  percentage decimal(5,2) [null]
+  cgpa decimal(4,2) [null]
+  year_of_passing integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_doctorate_qualification_details {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_college varchar [not null]
+  university varchar [not null]
+  college_address text [not null]
+  course varchar [not null]
+  branch varchar [not null]
+  marking_scheme varchar [null, note: "percentage | cgpa"]
+  percentage decimal(5,2) [null]
+  cgpa decimal(4,2) [null]
+  year_of_passing integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 4. WORK EXPERIENCES
+// ==========================================
+Table user_teaching_experiences {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  organization varchar [not null]
+  organization_address text [not null]
+  designation varchar [not null]
+  joining_date date [not null]
+  relieving_date date [null]
+  experience_months integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table user_industry_experiences {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  organization varchar [not null]
+  organization_address text [not null]
+  designation varchar [not null]
+  joining_date date [not null]
+  relieving_date date [null]
+  experience_months integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 5. INSTRUCTIONAL WORK & THESIS SUPERVISION
+// ==========================================
+Table instructional_work_assigneds {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  semester integer [not null]
+  course_code varchar(20) [not null]
+  course_title varchar [not null]
+  lecture_hours_per_week integer [default: 0]
+  tutorial_hours_per_week integer [default: 0]
+  practical_hours_per_week integer [default: 0]
+  strength_of_class integer [not null]
+  result_percentage_a_grade decimal(5,2) [null]
+  result_percentage_pass decimal(5,2) [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table btech_project_supervisions {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_student varchar [not null]
+  urn_of_student varchar(30) [not null]
+  co_supervisor_name varchar [null]
+  course_work_status varchar [default: "not_completed", note: "completed | not_completed"]
+  date_of_submission date [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table mtech_thesis_supervisions {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_student varchar [not null]
+  urn_of_student varchar(30) [not null]
+  co_supervisor_name varchar [null]
+  course_work_status varchar [default: "not_completed", note: "completed | not_completed"]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table phd_thesis_supervisions {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  name_of_student varchar [not null]
+  registration_number_of_student varchar(50) [not null]
+  co_supervisor_name varchar [null]
+  course_work_status varchar [default: "not_started", note: "not_started | in_progress | completed"]
+  research_work_status varchar [default: "not_started", note: "not_started | in_progress | completed"]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 6. ACADEMIC PERFORMANCE & CONTRIBUTIONS
+// ==========================================
+Table additional_duties {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  position varchar [not null]
+  level varchar [default: "college", note: "departmental | college | state | national | international"]
+  period varchar [not null]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table activity_organizeds {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  title varchar [not null]
+  duration varchar [not null]
+  major_sponsors varchar [null]
+  level varchar [default: "college", note: "departmental | college | state | national | international"]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table research_papers {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  title varchar [not null]
+  authors text [not null]
+  journal_or_conference_details varchar [not null]
+  level varchar [default: "national", note: "state | national | international"]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table sponsored_projects {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  title varchar [not null]
+  position varchar [not null]
+  sponsor_name varchar [not null]
+  date_of_commencement date [not null]
+  duration varchar [not null]
+  status varchar [default: "ongoing", note: "completed | ongoing"]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table consultancy_projects {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  title varchar [not null]
+  cost decimal(12,2) [not null]
+  position varchar [not null]
+  sponsor_name varchar [not null]
+  date_of_commencement date [not null]
+  duration varchar [not null]
+  status varchar [default: "ongoing", note: "completed | ongoing"]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table academic_participations {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  title varchar [not null]
+  duration varchar [not null]
+  institution varchar [not null]
+  position varchar [not null]
+  category varchar [default: "workshop", note: "seminar | workshop | conference | fdp | training | mooc"]
+  level varchar [default: "college", note: "departmental | college | state | national | international"]
+  documented_proof varchar [null]
+  comments text [null]
+  commented_by_emp_id integer [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 7. ANNUAL APPRAISAL REPORTS
+// ==========================================
+Table annual_appraisal_reports {
+  id integer [pk, increment]
+  emp_id integer [not null]
+  reporting_officer_emp_id integer [not null]
+  reviewing_officer_emp_id integer [null]
+  principal_emp_id integer [null]
+  academic_year varchar(10) [null]
+  initiative tinyint [null, note: "Rating 1-5"]
+  responsibility tinyint [null, note: "Rating 1-5"]
+  punctuality tinyint [null, note: "Rating 1-5"]
+  commitment tinyint [null, note: "Rating 1-5"]
+  loyalty tinyint [null, note: "Rating 1-5"]
+  development tinyint [null, note: "Rating 1-5"]
+  oral_communication tinyint [null, note: "Rating 1-5"]
+  written_communication tinyint [null, note: "Rating 1-5"]
+  teamwork tinyint [null, note: "Rating 1-5"]
+  leadership tinyint [null, note: "Rating 1-5"]
+  relationship_with_fellow_faculty_and_staff tinyint [null, note: "Rating 1-5"]
+  maturity tinyint [null, note: "Rating 1-5"]
+  temperament tinyint [null, note: "Rating 1-5"]
+  relationship_with_students tinyint [null, note: "Rating 1-5"]
+  total_score smallint [null]
+  overall_appraisal varchar [null, note: "outstanding | very_good | good | average | poor"]
+  reporting_officer_comments text [null]
+  reviewing_officer_remarks text [null]
+  principal_comments text [null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// ==========================================
+// 8. FOREIGN KEY REFERENCES
+// ==========================================
+
+// Profiles & Details
+Ref: users.emp_id - user_basic_details.emp_id // 1:1
+Ref: users.emp_id - user_professional_details.emp_id // 1:1
+
+// Academic Qualifications
+Ref: users.emp_id - user_secondary_qualification_details.emp_id // 1:1
+Ref: users.emp_id - user_higher_secondary_qualification_details.emp_id // 1:1
+Ref: users.emp_id - user_undergraduate_qualification_details.emp_id // 1:1
+Ref: users.emp_id - user_postgraduate_qualification_details.emp_id // 1:1
+Ref: users.emp_id - user_doctorate_qualification_details.emp_id // 1:1
+
+// Work Experiences (1:N)
+Ref: users.emp_id < user_teaching_experiences.emp_id
+Ref: users.emp_id < user_industry_experiences.emp_id
+
+// Instructional Work & Thesis Guidance (1:N)
+Ref: users.emp_id < instructional_work_assigneds.emp_id
+Ref: users.emp_id < btech_project_supervisions.emp_id
+Ref: users.emp_id < mtech_thesis_supervisions.emp_id
+Ref: users.emp_id < phd_thesis_supervisions.emp_id
+
+// Academic Activities & Research (1:N)
+Ref: users.emp_id < additional_duties.emp_id
+Ref: users.emp_id < activity_organizeds.emp_id
+Ref: users.emp_id < research_papers.emp_id
+Ref: users.emp_id < sponsored_projects.emp_id
+Ref: users.emp_id < consultancy_projects.emp_id
+Ref: users.emp_id < academic_participations.emp_id
+
+// Annual Appraisal Reports (1:N)
+Ref: users.emp_id < annual_appraisal_reports.emp_id
+Ref: users.emp_id < annual_appraisal_reports.reporting_officer_emp_id
+Ref: users.emp_id < annual_appraisal_reports.reviewing_officer_emp_id
+Ref: users.emp_id < annual_appraisal_reports.principal_emp_id
+
+// Evaluator / Commenter Relationships (1:N)
+Ref: users.emp_id < instructional_work_assigneds.commented_by_emp_id
+Ref: users.emp_id < btech_project_supervisions.commented_by_emp_id
+Ref: users.emp_id < mtech_thesis_supervisions.commented_by_emp_id
+Ref: users.emp_id < phd_thesis_supervisions.commented_by_emp_id
+Ref: users.emp_id < additional_duties.commented_by_emp_id
+Ref: users.emp_id < activity_organizeds.commented_by_emp_id
+Ref: users.emp_id < research_papers.commented_by_emp_id
+Ref: users.emp_id < sponsored_projects.commented_by_emp_id
+Ref: users.emp_id < consultancy_projects.commented_by_emp_id
+Ref: users.emp_id < academic_participations.commented_by_emp_id
+
+
+
