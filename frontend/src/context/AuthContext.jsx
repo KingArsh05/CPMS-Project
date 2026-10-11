@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import api from "../api/axios";
 
 const AuthContext = createContext(null);
@@ -8,10 +14,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
-  /**
-   * Initializes and checks the currently authenticated session via GET /api/me.
-   * Handles 401 silently without crashing or showing error screens.
-   */
   const checkAuth = useCallback(async () => {
     try {
       setLoading(true);
@@ -31,31 +33,44 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  /**
-   * Automatically initialize auth check once on app mount.
-   */
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    let isMounted = true;
 
-  /**
-   * Performs the Laravel Sanctum Cookie + Session Login sequence:
-   * 1. GET /sanctum/csrf-cookie
-   * 2. POST /api/auth/login
-   * 3. GET /api/me (or uses returned user)
-   */
-  const login = useCallback(
-    async (credentials) => {
-      // 1. Initialize CSRF protection cookie from Laravel
+    const initAuth = async () => {
+      try {
+        const { data } = await api.get("/api/me");
+        if (isMounted) {
+          setUser(data?.user || null);
+        }
+      } catch {
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          setAuthChecked(true);
+        }
+      }
+    };
+
+    initAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = useCallback(async (credentials) => {
+    setLoading(true);
+    try {
       await api.get("/sanctum/csrf-cookie");
 
-      // 2. Perform credential authentication
       const { data } = await api.post("/api/auth/login", {
         college_email_id: credentials.college_email_id,
         password: credentials.password,
       });
 
-      // 3. Confirm authenticated user session
       let authenticatedUser = data?.user;
       if (!authenticatedUser) {
         const meRes = await api.get("/api/me");
@@ -65,23 +80,15 @@ export function AuthProvider({ children }) {
       setUser(authenticatedUser);
       setAuthChecked(true);
       return authenticatedUser;
-    },
-    []
-  );
-
-  /**
-   * Logs out the user session.
-   * Note: Pre-wired for /api/auth/logout when backend endpoint is enabled.
-   */
-  const logout = useCallback(async () => {
-    try {
-      await api.post("/api/auth/logout");
-    } catch {
-      // Gracefully ignore logout network/404 errors on backend
     } finally {
-      setUser(null);
-      setAuthChecked(true);
+      setLoading(false);
     }
+  }, []);
+
+  const logout = useCallback(async () => {
+    await api.post("/api/auth/logout");
+    setUser(null);
+    setAuthChecked(true);
   }, []);
 
   const value = {
@@ -89,7 +96,7 @@ export function AuthProvider({ children }) {
     setUser,
     loading,
     authChecked,
-    isAuthenticated: !!user,
+    isAuthenticated: Boolean(user),
     checkAuth,
     login,
     logout,

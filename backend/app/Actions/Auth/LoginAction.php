@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 final class LoginAction
 {
-    public function execute(string $email, string $password): User
-    {
+    public function execute(
+        string $email,
+        string $password,
+        Request $request
+    ): User {
         if (! Auth::attempt([
             'college_email_id' => $email,
             'password' => $password,
@@ -36,7 +40,7 @@ final class LoginAction
             ]);
         }
 
-        request()->session()->regenerate();
+        $request->session()->regenerate();
 
         return $user;
     }
