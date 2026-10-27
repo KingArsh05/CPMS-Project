@@ -52,7 +52,7 @@ export default function AppLayout({ children, currentRoute, onNavigate }) {
         />
 
         {/* Dynamic Page Workspace */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-fadeIn">
+        <main className="flex-1 p-3.5 sm:p-5 lg:p-6 w-full animate-fadeIn">
           {children}
         </main>
       </div>

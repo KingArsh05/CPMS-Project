@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->unsignedInteger('emp_id')->primary();
-            $table->string("college_id", 20)->unique();
+            $table->string("college_id", 30)->unique();
             $table->string("name", 50);
             $table->string("college_email_id", 100)->unique();
             $table->string('password', 255);
@@ -24,18 +24,18 @@ return new class extends Migration {
                     'hod',
                     'establishment',
                     'principal',
-                    'admin'
+                    'dev_admin'
                 ]
-            )->comment('System role');
+            )->default("teacher");
             $table->enum(
                 'designation',
                 [
                     'professor',
-                    'associate_professor',
                     'assistant_professor',
-                    "hod"
+                    "hod",
+                    "principal"
                 ]
-            );
+            )->nullable();
             $table->enum('status', ['active', 'inactive', 'retired', "suspended"])->default('active');
             $table->rememberToken();
             $table->timestamps();

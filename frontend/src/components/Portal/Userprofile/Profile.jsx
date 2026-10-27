@@ -1,516 +1,360 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useAuth } from "../../../context/AuthContext";
 import BasicDetails from "./steps/BasicDetails";
+import ProfessionalDetails from "./steps/ProfessionalDetails";
+import SecondaryEducation from "./steps/SecondaryEducation";
+import HigherSecondaryEducation from "./steps/HigherSecondaryEducation";
+import UndergraduateEducation from "./steps/UndergraduateEducation";
+import PostgraduateEducation from "./steps/PostgraduateEducation";
+import DoctorateEducation from "./steps/DoctorateEducation";
 
 const STEPS = [
   {
     id: 1,
     title: "Basic Details",
-    mobileTitle: "Basic",
-    description: "Personal, identity and contact information",
+    subtitle: "Personal, contact & identity",
     required: true,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20 21a8 8 0 00-16 0M12 13a4 4 0 100-8 4 4 0 000 8z" />
+      </svg>
+    ),
   },
   {
     id: 2,
     title: "Professional Details",
-    mobileTitle: "Professional",
-    description: "Joining, service and employment information",
+    subtitle: "Service & designation",
     required: true,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="3" y="7" width="18" height="13" rx="2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 12h18M10 12v2h4v-2" />
+      </svg>
+    ),
   },
   {
     id: 3,
     title: "Secondary Education",
-    mobileTitle: "Secondary",
-    description: "10th standard academic information",
+    subtitle: "10th standard qualification",
     required: true,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
   },
   {
     id: 4,
-    title: "Undergraduate Education",
-    mobileTitle: "UG",
-    description: "Graduation and undergraduate qualification",
+    title: "Higher Secondary (12th)",
+    subtitle: "10+2 / Diploma records",
     required: true,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
   },
   {
     id: 5,
-    title: "Postgraduate Education",
-    mobileTitle: "PG",
-    description: "Postgraduate qualification details",
-    required: false,
+    title: "Undergraduate (UG)",
+    subtitle: "Bachelor's degree records",
+    required: true,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.5L12 5l9 4.5L12 14 3 9.5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12v4.5c3.5 2.5 8.5 2.5 12 0V12M21 10v5" />
+      </svg>
+    ),
   },
   {
     id: 6,
-    title: "Doctorate",
-    mobileTitle: "PhD",
-    description: "Doctoral qualification details",
+    title: "Postgraduate (PG)",
+    subtitle: "Master's degree records",
     required: false,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+      </svg>
+    ),
+  },
+  {
+    id: 7,
+    title: "Doctorate (PhD)",
+    subtitle: "Doctoral research details",
+    required: false,
+    icon: (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.003 0H9.497m5.003 0a2.25 2.25 0 002.25-2.25v-.872c0-.51-.345-.953-.842-1.066l-3.376-.772a2.25 2.25 0 00-1.004 0l-3.376.772a1.084 1.084 0 00-.842 1.066v.872a2.25 2.25 0 002.25 2.25" />
+      </svg>
+    ),
   },
 ];
 
-function UserIcon() {
-  return (
-    <svg
-      className="w-5 h-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M20 21a8 8 0 00-16 0M12 13a4 4 0 100-8 4 4 0 000 8z"
-      />
-    </svg>
-  );
-}
-
-function BriefcaseIcon() {
-  return (
-    <svg
-      className="w-5 h-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <rect x="3" y="7" width="18" height="13" rx="2" />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 12h18M10 12v2h4v-2"
-      />
-    </svg>
-  );
-}
-
-function AcademicIcon() {
-  return (
-    <svg
-      className="w-5 h-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3 9.5L12 5l9 4.5L12 14 3 9.5z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 12v4.5c3.5 2.5 8.5 2.5 12 0V12M21 10v5"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M16.704 5.296a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3.25-3.25a1 1 0 111.414-1.414l2.543 2.543 6.543-6.543a1 1 0 011.414 0z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M17 10a1 1 0 01-1 1H6.414l3.293 3.293a1 1 0 01-1.414 1.414l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L6.414 9H16a1 1 0 011 1z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M3 10a1 1 0 011-1h9.586l-3.293-3.293a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 1.414L13.586 11H4a1 1 0 01-1-1z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function getStepIcon(stepId) {
-  if (stepId === 1) return <UserIcon />;
-  if (stepId === 2) return <BriefcaseIcon />;
-  return <AcademicIcon />;
-}
-
-function renderStep(currentStep) {
-  switch (currentStep) {
-    case 1:
-      return <BasicDetails />;
-
-    default:
-      return null;
-  }
-}
-
 export default function Profile() {
   const { user } = useAuth();
-
   const methods = useForm({
     mode: "onChange",
-    shouldUnregister: false,
   });
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState([]);
+  const [step, setStep] = useState(1);
 
-  const activeStep = STEPS[currentStep - 1];
-  const requiredSteps = STEPS.filter((step) => step.required);
+  const nextStep = (increment = 1) => {
+    setStep((s) => Math.min(s + increment, STEPS.length));
+  };
 
-  const completedRequiredSteps = useMemo(() => {
-    return requiredSteps.filter((step) => completedSteps.includes(step.id))
-      .length;
-  }, [completedSteps]);
+  const prevStep = (decrement = 1) => {
+    setStep((s) => Math.max(s - decrement, 1));
+  };
 
-  const completionPercentage = Math.round(
-    (completedRequiredSteps / requiredSteps.length) * 100,
+  // Required steps count (steps 1 to 4)
+  const requiredSteps = STEPS.filter((s) => s.required);
+  const completedRequiredSteps = Math.min(step - 1, requiredSteps.length);
+  const progressPercent = Math.round(
+    (completedRequiredSteps / requiredSteps.length) * 100
   );
 
-  const markCurrentStepCompleted = () => {
-    setCompletedSteps((previous) =>
-      previous.includes(currentStep) ? previous : [...previous, currentStep],
-    );
-  };
-
-  const handleNext = () => {
-    markCurrentStepCompleted();
-
-    if (currentStep < STEPS.length) {
-      setCurrentStep((previous) => previous + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep((previous) => previous - 1);
-    }
-  };
-
-  const handleSkip = () => {
-    if (!activeStep.required && currentStep < STEPS.length) {
-      setCurrentStep((previous) => previous + 1);
-    }
-  };
-
-  const handleStepClick = (stepId) => {
-    const previousStepCompleted = completedSteps.includes(stepId - 1);
-
-    if (stepId === 1 || stepId <= currentStep || previousStepCompleted) {
-      setCurrentStep(stepId);
-    }
-  };
-
-  const handleSubmit = (data) => {
-    console.log("Profile submitted:", data);
-  };
+  const activeStep = STEPS[step - 1];
 
   return (
     <FormProvider {...methods}>
-      <div className="space-y-6">
-        {/* PAGE HEADER */}
-        <div className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xs">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 dark:bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="w-full space-y-4">
+        {/* TOP SECTION: Header Banner with Progress Bar */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-1">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
                   GNDEC Faculty Management
                 </span>
-
-                <span className="text-slate-400 text-xs">•</span>
-
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  Faculty Profile
+                <span className="text-slate-300 dark:text-slate-700">•</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Faculty Institutional Records
                 </span>
               </div>
-
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Complete Your Profile
-              </h1>
-
-              <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-                Complete your personal, professional and academic information to
-                maintain an accurate institutional profile.
-              </p>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {activeStep?.title}
+                </h1>
+                <span
+                  className={`px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-md ${
+                    activeStep?.required
+                      ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                  }`}
+                >
+                  {activeStep?.required ? "Required Section" : "Optional Section"}
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 p-4 rounded-xl shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                <UserIcon />
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Profile Completion
+            {/* Quick Stat Pill */}
+            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 px-4 py-2 rounded-xl shrink-0 self-start sm:self-auto">
+              <div className="text-right">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Mandatory Progress
                 </span>
-
-                <p className="text-lg font-extrabold text-slate-900 dark:text-white">
-                  {completionPercentage}% Complete
-                </p>
+                <span className="text-sm font-black text-blue-600 dark:text-blue-400">
+                  {completedRequiredSteps} of {requiredSteps.length} Required ({progressPercent}%)
+                </span>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs shadow-blue-500/25">
+                {step}/{STEPS.length}
               </div>
             </div>
           </div>
-        </div>
 
-        {/* PROGRESS STEPPER */}
-        <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xs">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Profile Setup
-              </span>
-
-              <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-white">
-                Step {currentStep} of {STEPS.length}
-              </p>
+          {/* Progress Bar */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5">
+              <span>Required Sections Completion</span>
+              <span className="text-blue-600 dark:text-blue-400 font-bold">{progressPercent}% Completed</span>
             </div>
-
-            <div className="text-right">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Required Sections
-              </span>
-
-              <p className="mt-0.5 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400">
-                {completedRequiredSteps} of {requiredSteps.length} completed
-              </p>
-            </div>
-          </div>
-
-          {/* DESKTOP STEPPER */}
-          <div className="hidden md:block">
-            <div className="relative">
-              <div className="absolute left-[8.33%] right-[8.33%] top-5 h-px bg-slate-200 dark:bg-slate-800" />
-
+            
+            <div className="relative w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="absolute left-[8.33%] top-5 h-px bg-blue-600 transition-all duration-500"
-                style={{
-                  width: `${((currentStep - 1) / (STEPS.length - 1)) * 83.34}%`,
-                }}
+                className="h-full bg-linear-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500 ease-out shadow-xs shadow-blue-500/40"
+                style={{ width: `${Math.max(progressPercent, 4)}%` }}
               />
+            </div>
 
-              <div className="relative grid grid-cols-6">
-                {STEPS.map((step) => {
-                  const isCurrent = currentStep === step.id;
-                  const isCompleted = completedSteps.includes(step.id);
-                  const isAccessible =
-                    step.id <= currentStep ||
-                    completedSteps.includes(step.id - 1);
-
-                  return (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => handleStepClick(step.id)}
-                      disabled={!isAccessible}
-                      className={`flex flex-col items-center text-center ${
-                        isAccessible ? "cursor-pointer" : "cursor-not-allowed"
+            {/* Step Segments */}
+            <div className="grid grid-cols-7 gap-1.5 mt-2">
+              {STEPS.map((s) => {
+                const isPassed = step > s.id;
+                const isCurrent = step === s.id;
+                return (
+                  <div key={s.id} className="flex flex-col gap-1">
+                    <div
+                      className={`h-1 rounded-full transition-all duration-300 ${
+                        isPassed
+                          ? "bg-blue-600 dark:bg-blue-500"
+                          : isCurrent
+                          ? "bg-blue-400 dark:bg-blue-600 animate-pulse"
+                          : "bg-slate-200 dark:bg-slate-800"
                       }`}
-                    >
-                      <div
-                        className={`relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-200 ${
-                          isCompleted
-                            ? "bg-blue-600 border-blue-600 text-white"
-                            : isCurrent
-                              ? "bg-white dark:bg-slate-900 border-blue-600 text-blue-600 shadow-[0_0_0_4px_rgba(37,99,235,0.15)]"
-                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400"
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <CheckIcon />
-                        ) : (
-                          <span className="text-xs font-bold">{step.id}</span>
-                        )}
-                      </div>
-
+                    />
+                    <div className="flex items-center gap-1">
                       <span
-                        className={`mt-2 text-xs font-bold ${
+                        className={`text-[9px] font-medium truncate hidden md:block ${
                           isCurrent
-                            ? "text-blue-600 dark:text-blue-400"
-                            : isCompleted
-                              ? "text-slate-800 dark:text-slate-200"
-                              : "text-slate-400"
+                            ? "text-blue-600 dark:text-blue-400 font-bold"
+                            : isPassed
+                            ? "text-slate-600 dark:text-slate-300"
+                            : "text-slate-400 dark:text-slate-500"
                         }`}
                       >
-                        {step.title}
+                        {s.title}
                       </span>
-
-                      <span className="mt-0.5 text-[10px] text-slate-400">
-                        {step.required ? "Required" : "Optional"}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* MOBILE STEPPER */}
-          <div className="md:hidden">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center shrink-0 w-10 h-10 text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/60 rounded-xl">
-                {currentStep}
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-bold text-slate-900 dark:text-white">
-                    {activeStep.title}
-                  </span>
-
-                  <span className="text-[10px] font-semibold text-slate-400">
-                    {currentStep} / {STEPS.length}
-                  </span>
-                </div>
-
-                <div className="w-full h-1.5 overflow-hidden bg-slate-100 dark:bg-slate-800 rounded-full">
-                  <div
-                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(currentStep / STEPS.length) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* REQUIRED PROGRESS */}
-          <div className="pt-4 mt-5 border-t border-slate-100 dark:border-slate-800/80">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Required profile progress
-              </span>
-
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-                {completionPercentage}%
-              </span>
-            </div>
-
-            <div className="w-full h-1.5 overflow-hidden bg-slate-100 dark:bg-slate-800 rounded-full">
-              <div
-                className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                style={{ width: `${completionPercentage}%` }}
-              />
+                      {!s.required && (
+                        <span className="text-[8px] text-slate-400 hidden xl:inline">
+                          (opt)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* CURRENT STEP FORM */}
-        <form onSubmit={methods.handleSubmit(handleSubmit)}>
-          <div className="overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xs">
-            {/* FORM HEADER */}
-            <div className="flex flex-col gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 md:flex-row md:items-center md:justify-between md:px-7">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center shrink-0 w-10 h-10 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 rounded-xl">
-                  {getStepIcon(activeStep.id)}
-                </div>
+        {/* BOTTOM SECTION: 30% Stepper Sidebar + 70% Step Details Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          {/* 30% Vertical Stepper Sidebar */}
+          <div className="lg:col-span-4 xl:col-span-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs lg:sticky lg:top-4">
+            <div className="px-2 pb-3 mb-2 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                Verification Steps
+              </span>
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">
+                5 Required • 2 Optional
+              </p>
+            </div>
 
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">
-                      {activeStep.title}
-                    </h2>
+            <nav className="space-y-1.5" aria-label="Steps">
+              {STEPS.map((s) => {
+                const isActive = step === s.id;
+                const isPast = step > s.id;
 
-                    <span
-                      className={`px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded-md ${
-                        activeStep.required
-                          ? "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60"
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setStep(s.id)}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all cursor-pointer relative overflow-hidden ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/25 ring-1 ring-blue-500 font-semibold"
+                        : isPast
+                        ? "bg-blue-50/50 dark:bg-blue-950/20 text-slate-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    }`}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 inset-y-0 w-1 bg-white rounded-r-full" />
+                    )}
+
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black shrink-0 transition-all ${
+                        isActive
+                          ? "bg-white/20 text-white shadow-2xs"
+                          : isPast
+                          ? "bg-blue-600 text-white"
                           : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                       }`}
                     >
-                      {activeStep.required ? "Required" : "Optional"}
-                    </span>
-                  </div>
+                      {isPast ? (
+                        <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.704 5.29a1 1 0 010 1.42l-7.25 7.25a1 1 0 01-1.42 0l-3.25-3.25a1 1 0 111.42-1.42l2.54 2.54 6.54-6.54a1 1 0 011.42 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      ) : (
+                        s.id
+                      )}
+                    </div>
 
-                  <p className="mt-0.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-                    {activeStep.description}
-                  </p>
-                </div>
-              </div>
-
-              <span className="self-start px-2.5 py-1 text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 rounded-lg md:self-auto">
-                Section {currentStep}
-              </span>
-            </div>
-
-            {/* ACTUAL STEP COMPONENT */}
-            <div className="px-6 py-6 md:px-7 md:py-7">
-              {renderStep(currentStep)}
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex flex-col-reverse gap-3 px-6 py-4 border-t border-slate-100 dark:border-slate-800/80 sm:flex-row sm:items-center sm:justify-between md:px-7">
-              <button
-                type="button"
-                onClick={handlePrevious}
-                disabled={currentStep === 1}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-              >
-                <ArrowLeftIcon />
-                Previous
-              </button>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
-                {!activeStep.required && (
-                  <button
-                    type="button"
-                    onClick={handleSkip}
-                    className="inline-flex items-center justify-center px-5 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
-                  >
-                    Skip for Now
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className={`text-xs font-bold truncate ${isActive ? "text-white" : "text-slate-800 dark:text-slate-200"}`}>
+                          {s.title}
+                        </p>
+                        <span
+                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase ${
+                            isActive
+                              ? "bg-white/25 text-white"
+                              : s.required
+                              ? "bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/50"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                          }`}
+                        >
+                          {s.required ? "Req" : "Opt"}
+                        </span>
+                      </div>
+                      <p className={`text-[10px] truncate mt-0.5 ${isActive ? "text-blue-100" : "text-slate-400"}`}>
+                        {s.subtitle}
+                      </p>
+                    </div>
                   </button>
-                )}
-
-                {currentStep < STEPS.length ? (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-bold text-white bg-blue-600 rounded-xl shadow-xs hover:bg-blue-700 active:bg-blue-800 transition-all cursor-pointer"
-                  >
-                    Save & Continue
-                    <ArrowRightIcon />
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs sm:text-sm font-bold text-white bg-blue-600 rounded-xl shadow-xs hover:bg-blue-700 active:bg-blue-800 transition-all cursor-pointer"
-                  >
-                    Complete Profile
-                    <CheckIcon />
-                  </button>
-                )}
-              </div>
-            </div>
+                );
+              })}
+            </nav>
           </div>
-        </form>
 
-        {/* FOOTER */}
-        <div className="flex flex-col gap-1 px-1 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] text-slate-400">
-            Logged in as {user?.name || "Faculty Member"}
-          </p>
-
-          <p className="text-[11px] text-slate-400">
-            Required sections must be completed before profile submission.
-          </p>
+          {/* 70% Form Canvas */}
+          <div className="lg:col-span-8 xl:col-span-9 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-2xs">
+            {step === 1 && (
+              <BasicDetails
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 2 && (
+              <ProfessionalDetails
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 3 && (
+              <SecondaryEducation
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 4 && (
+              <HigherSecondaryEducation
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 5 && (
+              <UndergraduateEducation
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 6 && (
+              <PostgraduateEducation
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+            {step === 7 && (
+              <DoctorateEducation
+                nextStep={nextStep}
+                prevStep={prevStep}
+                setStep={setStep}
+              />
+            )}
+          </div>
         </div>
       </div>
     </FormProvider>

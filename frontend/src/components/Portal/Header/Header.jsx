@@ -43,6 +43,7 @@ export default function Header({
   const { darkMode, toggleTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const triggerRef = useRef(null);
 
   // Close dropdown on outside click or Escape
   useEffect(() => {
@@ -52,7 +53,10 @@ export default function Header({
       }
     };
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") setIsDropdownOpen(false);
+      if (e.key === "Escape") {
+        setIsDropdownOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener("mousedown", handleOutsideClick);
     document.addEventListener("keydown", handleKeyDown);
@@ -281,6 +285,7 @@ export default function Header({
           {/* Profile */}
           <div className="relative" ref={dropdownRef}>
             <button
+              ref={triggerRef}
               type="button"
               onClick={() => setIsDropdownOpen((p) => !p)}
               aria-expanded={isDropdownOpen}
@@ -330,11 +335,11 @@ export default function Header({
             {/* Dropdown — always mounted for pure-tailwind enter animation */}
             <div
               role="menu"
-              aria-hidden={!isDropdownOpen}
+              inert={!isDropdownOpen ? true : undefined}
               className={`absolute right-0 top-[calc(100%+10px)] z-50 w-80 max-w-[calc(100vw-2rem)] origin-top-right overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 transition-all duration-150 ease-out dark:border-slate-700/70 dark:bg-slate-900 dark:shadow-black/40 ${
                 isDropdownOpen
-                  ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-                  : "pointer-events-none -translate-y-1 scale-[0.98] opacity-0"
+                  ? "pointer-events-auto translate-y-0 scale-100 opacity-100 visible"
+                  : "pointer-events-none -translate-y-1 scale-[0.98] opacity-0 invisible"
               }`}
             >
               {/* Identity */}
@@ -378,8 +383,9 @@ export default function Header({
                       role="menuitem"
                       tabIndex={isDropdownOpen ? 0 : -1}
                       onClick={() => {
-                        onNavigate?.(item.route);
                         setIsDropdownOpen(false);
+                        triggerRef.current?.focus();
+                        onNavigate?.(item.route);
                       }}
                       className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-blue-600 ${
                         active
@@ -453,6 +459,7 @@ export default function Header({
                   tabIndex={isDropdownOpen ? 0 : -1}
                   onClick={() => {
                     setIsDropdownOpen(false);
+                    triggerRef.current?.focus();
                     onOpenLogout?.();
                   }}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-600 active:scale-[0.99] dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/20"
